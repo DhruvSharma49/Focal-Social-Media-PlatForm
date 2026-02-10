@@ -1,0 +1,33 @@
+
+// const jwt = require("jsonwebtoken");
+
+// module.exports = async (req, res, next) => {
+//   const { authorization } = req.headers;
+//   if (!authorization) {
+//     return res.status(401).json({ error: "You must be logged in" });
+//   }
+//   console.log("authorization", authorization);
+//   const token = authorization.replace("Bearer ", "");
+//      console.log("token",token)
+//   const tokenisVerifedOrNot = jwt.verify(token, process.env.SECRET_KEY);
+//   console.log(tokenisVerifedOrNot);
+//   req.user = tokenisVerifedOrNot.user;
+//   next();
+// };
+
+const jwt = require("jsonwebtoken");
+
+module.exports = (req, res, next) => {
+  const token = req.cookies.token;   // 🔥 from cookie
+
+  if (!token) return res.status(401).json({ error: "Login required" });
+
+  try {
+    const verified = jwt.verify(token, process.env.SECRET_KEY);
+    req.user = verified.id;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+};
+

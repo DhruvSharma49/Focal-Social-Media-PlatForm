@@ -1,20 +1,28 @@
 const dotenv = require("dotenv");
 const express = require("express");
-const connection = require("./DataBase/connection.db");
+const connection = require("./src/DataBase/connection.db");
 const cors = require('cors');  
+const cookieParser=require('cookie-parser');
 const app = express();
-app.use(cors());
 dotenv.config();
 connection();
 
 app.use(express.json());
-app.use("/user", require("./routes/auth.route"));
-app.use("/post", require("./routes/post.route"));
-app.use("/interact",require('./routes/user.route'))
-app.use("/createstory",require('./routes/story.route'))
+app.use(cors({
+  origin:"http://localhost:5173",
+  credentials:true
+}));
+app.use(cookieParser())
+const authRoutes = require("./src/routes/auth.route");
 
 
-const PORT = process.env.PORT || 4000;
+app.use("/user",authRoutes);
+app.use("/post", require("./src/routes/post.route"));
+app.use("/interact",require('./src/routes/user.route'))
+app.use("/createstory",require('./src/routes/story.route'))
+
+
+const PORT = process.env.PORT ;
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });

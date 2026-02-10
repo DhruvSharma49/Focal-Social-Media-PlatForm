@@ -1,6 +1,6 @@
 const express = require("express");
 const requireLogin = require("../middleware/requirelogin");
-const Story = require("../module/story.module");
+const Story = require("../module/story.model");
 
 const router = express.Router();
 
