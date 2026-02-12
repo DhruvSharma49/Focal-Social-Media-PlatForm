@@ -1,5 +1,132 @@
+// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+// import Login from "./Pages/Login";
+// import Signup from "./Pages/Signup";
+// import Sidebar from "./components/Sidebar";
+// import Index from "./Pages/Index";
+// import Search from "./Pages/Search";
+// import Explore from "./Pages/Expore";
+// import Reels from "./Pages/Reels";
+// import Messages from "./Pages/Message";
+// import Notifications from "./Pages/Notification";
+// import Profile from "./Pages/Profile";
+// import Settings from "./Pages/Settings";
+// import NotFound from "./Pages/NotFound";
+// import AuthLayout from "./components/Authlayout";
+
+// const queryClient = new QueryClient();
+
+// // Layout wrapper with optional sidebar
+// const MainLayout = ({ children, showSidebar = true }) => (
+//   <div className="min-h-screen bg-background flex">
+//     {showSidebar && <Sidebar />}
+//     <main className={`flex-1 ${showSidebar ? "ml-[72px] xl:ml-[244px]" : ""}`}>
+//       {children}
+//     </main>
+//   </div>
+// );
+
+// const App = () => (
+
+//   <QueryClientProvider client={queryClient}>
+//     <BrowserRouter>
+//       <Routes>
+//         {/* Default redirect to login */}
+//         <Route path="/" element={<Navigate to="/login" replace />} />
+
+//         {/* Auth routes */}
+//         <Route element={<AuthLayout />}>
+//           <Route path="/login" element={<Login />} />
+//           <Route path="/signup" element={<Signup />} />
+//         </Route>
+
+//         {/* Main App routes */}
+//         <Route
+//           path="/home"
+//           element={
+//             <MainLayout>
+//               <Index />
+//             </MainLayout>
+//           }
+//         />
+//         <Route
+//           path="/search"
+//           element={
+//             <MainLayout>
+//               <Search />
+//             </MainLayout>
+//           }
+//         />
+//         <Route
+//           path="/explore"
+//           element={
+//             <MainLayout>
+//               <Explore />
+//             </MainLayout>
+//           }
+//         />
+//         <Route
+//           path="/reels"
+//           element={
+//             <MainLayout showSidebar={false}>
+//               <Reels />
+//             </MainLayout>
+//           }
+//         />
+//         <Route
+//           path="/messages"
+//           element={
+//             <MainLayout>
+//               <Messages />
+//             </MainLayout>
+//           }
+//         />
+//         <Route
+//           path="/notifications"
+//           element={
+//             <MainLayout>
+//               <Notifications />
+//             </MainLayout>
+//           }
+//         />
+//         <Route
+//           path="/profile"
+//           element={
+//             <MainLayout>
+//               <Profile />
+//             </MainLayout>
+//           }
+//         />
+//         <Route
+//           path="/profile/:id"
+//           element={
+//             <MainLayout>
+//               <Profile />
+//             </MainLayout>
+//           }
+//         />
+//         <Route
+//           path="/settings"
+//           element={
+//             <MainLayout>
+//          <Settings/>
+//             </MainLayout>
+//           }
+//         />
+
+//         {/* Catch-all 404 */}
+//         <Route path="*" element={<NotFound />} />
+//       </Routes>
+//     </BrowserRouter>
+//   </QueryClientProvider>
+// );
+
+// export default App;
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Sidebar from "./components/Sidebar";
@@ -14,12 +141,10 @@ import Settings from "./Pages/Settings";
 import NotFound from "./Pages/NotFound";
 import AuthLayout from "./components/Authlayout";
 
-
 const queryClient = new QueryClient();
 
-// Layout wrapper with optional sidebar
 const MainLayout = ({ children, showSidebar = true }) => (
-  <div className="min-h-screen bg-background flex">
+  <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex transition-colors">
     {showSidebar && <Sidebar />}
     <main className={`flex-1 ${showSidebar ? "ml-[72px] xl:ml-[244px]" : ""}`}>
       {children}
@@ -27,100 +152,122 @@ const MainLayout = ({ children, showSidebar = true }) => (
   </div>
 );
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <Routes>
-        {/* Default redirect to login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+const App = () => {
+  const [darkMode, setDarkMode] = useState(false);
 
-        {/* Auth routes */}
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-        </Route>
+  // First load: apply saved theme instantly
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setDarkMode(true);
+      document.documentElement.classList.add("dark");
+    } else {
+      setDarkMode(false);
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
 
-        {/* Main App routes */}
-        <Route
-          path="/home"
-          element={
-            <MainLayout>
-              <Index />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/search"
-          element={
-            <MainLayout>
-              <Search />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/explore"
-          element={
-            <MainLayout>
-              <Explore />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/reels"
-          element={
-            <MainLayout showSidebar={false}>
-              <Reels />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/messages"
-          element={
-            <MainLayout>
-              <Messages />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/notifications"
-          element={
-            <MainLayout>
-              <Notifications />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <MainLayout>
-              <Profile />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/profile/:id"
-          element={
-            <MainLayout>
-              <Profile />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <MainLayout>
-         <Settings/>
-            </MainLayout>
-          }
-        />
+  // Sync darkMode state changes with html & localStorage
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
 
-        {/* Catch-all 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+
+          <Route element={<AuthLayout />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Route>
+
+          <Route
+            path="/home"
+            element={
+              <MainLayout>
+                <Index />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <MainLayout>
+                <Search />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/explore"
+            element={
+              <MainLayout>
+                <Explore />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/reels"
+            element={
+              <MainLayout>
+                <Reels />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/messages"
+            element={
+              <MainLayout>
+                <Messages />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <MainLayout>
+                <Notifications />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <MainLayout>
+                <Profile />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/profile/:id"
+            element={
+              <MainLayout>
+                <Profile />
+              </MainLayout>
+            }
+          />
+
+          <Route
+            path="/settings"
+            element={
+              <MainLayout>
+                <Settings darkMode={darkMode} setDarkMode={setDarkMode} />
+              </MainLayout>
+            }
+          />
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
-
-

@@ -1,163 +1,184 @@
-// import React, { useState, useRef } from "react";
-// import { X, Image as ImageIcon, MapPin, Users, ChevronDown, Smile } from "lucide-react";
+// import { useState, useRef } from "react";
 // import api from "../utils/api";
-// import { useSelector } from "react-redux";
-
 
 // const CreatePostModal = ({ isOpen, onClose }) => {
-//   const [step, setStep] = useState("select");
 //   const [selectedImage, setSelectedImage] = useState(null);
 //   const [caption, setCaption] = useState("");
 //   const fileInputRef = useRef(null);
-  
-//   const token = useSelector((state) => state.auth.token);
+
+//   const token = localStorage.getItem("token");
+
 //   if (!isOpen) return null;
 
 //   const handleFileSelect = (e) => {
-//     const file = e.target.files && e.target.files[0];
-//     if (file) {
-//       const reader = new FileReader();
-//       reader.onload = (event) => {
-//         setSelectedImage(event.target.result);
-//         setStep("edit");
-//       };
-//       reader.readAsDataURL(file);
-//     }
+//     const file = e.target.files[0];
+//     const reader = new FileReader();
+//     reader.onload = () => setSelectedImage(reader.result);
+//     reader.readAsDataURL(file);
 //   };
 
-// const handleShare = async () => {
-//   try {
-//     await api.post(
-//       "/post/createPost",
-//       { caption, image: selectedImage },
-//       { headers: { Authorization: `Bearer ${token}` } }
-//     );
+// const handlePost = async () => {
+//   if (!fileInputRef.current.files[0] || !caption)
+//     return alert("Add image and caption");
 
+//   const formData = new FormData();
+//   formData.append("image", fileInputRef.current.files[0]);
+//   formData.append("caption", caption);
+
+//   try {
+//     await api.post("/post/createPost", formData, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         "Content-Type": "multipart/form-data",
+//       },
+//     });
+
+//     alert("Post Created");
 //     onClose();
-//     setStep("select");
 //     setSelectedImage(null);
 //     setCaption("");
 //   } catch (err) {
-//     console.error("Post error", err);
+//     console.log(err.response?.data);
 //   }
 // };
 
 
 //   return (
-//     <div className="fixed inset-0 z-50 flex items-center justify-center">
-//       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
+//     <div className="fixed inset-0 flex items-center justify-center bg-black/70">
+//       <div className="bg-white p-6 rounded-xl w-[500px] space-y-4">
+//         <input type="file" ref={fileInputRef} onChange={handleFileSelect} />
 
-//       <div className="relative bg-secondary rounded-xl overflow-hidden max-w-[800px] w-full mx-4">
-//         <div className="flex items-center justify-between px-4 py-3 border-b border-divider">
-//           {step !== "select" && (
-//             <button onClick={() => setStep("select")} className="text-foreground">
-//               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-//                 <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-//               </svg>
-//             </button>
-//           )}
-//           <h2 className="font-semibold text-center flex-1">Create new post</h2>
-//           {step === "caption" ? (
-//             <button onClick={handleShare} className="text-primary font-semibold">Share</button>
-//           ) : step === "edit" ? (
-//             <button onClick={() => setStep("caption")} className="text-primary font-semibold">Next</button>
-//           ) : (
-//             <div className="w-6" />
-//           )}
-//         </div>
+//         {selectedImage && (
+//           <img src={selectedImage} className="w-full h-64 object-cover rounded" />
+//         )}
 
-//         <div className="min-h-[400px]">
-//           {step === "select" && (
-//             <div className="flex flex-col items-center justify-center h-[400px] gap-4">
-//               <ImageIcon className="w-20 h-20 text-muted-foreground" />
-//               <p className="text-xl">Drag photos and videos here</p>
-//               <button
-//                 onClick={() => fileInputRef.current && fileInputRef.current.click()}
-//                 className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-semibold"
-//               >
-//                 Select from computer
-//               </button>
-//               <input
-//                 ref={fileInputRef}
-//                 type="file"
-//                 accept="image/*,video/*"
-//                 onChange={handleFileSelect}
-//                 className="hidden"
-//               />
-//             </div>
-//           )}
+//         <textarea
+//           placeholder="Write caption..."
+//           value={caption}
+//           onChange={(e) => setCaption(e.target.value)}
+//           className="w-full border p-2 rounded"
+//         />
 
-//           {step === "edit" && selectedImage && (
-//             <div className="aspect-square max-h-[500px]">
-//               <img src={selectedImage} alt="Selected" className="w-full h-full object-contain bg-black" />
-//             </div>
-//           )}
-
-//           {step === "caption" && selectedImage && (
-//             <div className="flex">
-//               <div className="w-1/2 aspect-square">
-//                 <img src={selectedImage} alt="Selected" className="w-full h-full object-contain bg-black" />
-//               </div>
-//               <div className="w-1/2 p-4 flex flex-col">
-//                 <div className="flex items-center gap-3 mb-4">
-//                   <img
-//                     src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=50&h=50&fit=crop"
-//                     alt="Profile"
-//                     className="w-7 h-7 rounded-full object-cover"
-//                   />
-//                   <span className="font-semibold text-sm">sharma_dhruv49</span>
-//                 </div>
-
-//                 <textarea
-//                   value={caption}
-//                   onChange={(e) => setCaption(e.target.value)}
-//                   placeholder="Write a caption..."
-//                   className="flex-1 bg-transparent resize-none outline-none text-sm placeholder:text-muted-foreground"
-//                   maxLength={2200}
-//                 />
-
-//                 <div className="flex items-center justify-between text-muted-foreground text-xs mt-2">
-//                   <Smile className="w-5 h-5 cursor-pointer" />
-//                   <span>{caption.length}/2,200</span>
-//                 </div>
-
-//                 <div className="border-t border-divider mt-4 pt-4 space-y-3">
-//                   <div className="flex items-center justify-between cursor-pointer">
-//                     <span className="text-sm">Add location</span>
-//                     <MapPin className="w-4 h-4" />
-//                   </div>
-//                   <div className="flex items-center justify-between cursor-pointer">
-//                     <span className="text-sm">Tag people</span>
-//                     <Users className="w-4 h-4" />
-//                   </div>
-//                   <div className="flex items-center justify-between cursor-pointer">
-//                     <span className="text-sm">Accessibility</span>
-//                     <ChevronDown className="w-4 h-4" />
-//                   </div>
-//                   <div className="flex items-center justify-between cursor-pointer">
-//                     <span className="text-sm">Advanced settings</span>
-//                     <ChevronDown className="w-4 h-4" />
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//           )}
-//         </div>
+//         <button
+//           onClick={handlePost}
+//           className="w-full bg-blue-600 text-white py-2 rounded-lg"
+//         >
+//           🚀 Post Now
+//         </button>
 //       </div>
-
-//       <button onClick={onClose} className="absolute top-4 right-4 text-foreground">
-//         <X className="w-6 h-6" />
-//       </button>
 //     </div>
 //   );
 // };
 
 // export default CreatePostModal;
+
+
+// import { useState, useRef } from "react";
+// import api from "../utils/api";
+
+// const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
+//   const [selectedFile, setSelectedFile] = useState(null);
+//   const [caption, setCaption] = useState("");
+//   const fileInputRef = useRef(null);
+
+//   const token = localStorage.getItem("token");
+
+//   if (!isOpen) return null;
+
+//   const handleFileChange = (e) => {
+//     const file = e.target.files[0];
+//     if (file) setSelectedFile(file);
+//   };
+
+//   const handleSubmit = async () => {
+//     if (!selectedFile || !caption) {
+//       return alert("Image aur caption dono chahiye!");
+//     }
+
+//     const formData = new FormData();
+//     formData.append("image", selectedFile);
+//     formData.append("caption", caption);
+
+//     try {
+//       const response = await api.post("/post/createPost", formData, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Content-Type": "multipart/form-data",
+//         },
+//       });
+
+//       alert("Post Created Successfully 🎉");
+      
+//       // clear state
+//       setSelectedFile(null);
+//       setCaption("");
+//       onClose();
+
+//       // call parent refresh if provided
+//       if (onPostCreated) onPostCreated(response.data.post);
+
+//     } catch (err) {
+//       console.log(err.response?.data);
+//       alert("Error creating post");
+//     }
+//   };
+
+//   return (
+//     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+//       <div className="bg-white p-6 rounded-lg w-[400px] space-y-4">
+//         <h2 className="text-xl font-semibold text-center">Create New Post</h2>
+
+//         <input
+//           type="file"
+//           accept="image/*"
+//           ref={fileInputRef}
+//           onChange={handleFileChange}
+//           className="w-full"
+//         />
+
+//         {selectedFile && (
+//           <img
+//             src={URL.createObjectURL(selectedFile)}
+//             alt="preview"
+//             className="w-full h-64 object-cover rounded"
+//           />
+//         )}
+
+//         <textarea
+//           placeholder="Write your caption..."
+//           value={caption}
+//           onChange={(e) => setCaption(e.target.value)}
+//           className="w-full border p-2 rounded"
+//         />
+
+//         <button
+//           onClick={handleSubmit}
+//           className="w-full bg-blue-600 text-white py-2 rounded-lg"
+//         >
+//           🚀 Post Now
+//         </button>
+
+//         <button
+//           onClick={onClose}
+//           className="w-full bg-gray-300 text-black py-2 rounded-lg"
+//         >
+//           Cancel
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default CreatePostModal;
+
+
+
 import { useState, useRef } from "react";
+import { X, ImagePlus } from "lucide-react";
 import api from "../utils/api";
 
-const CreatePostModal = ({ isOpen, onClose }) => {
-  const [selectedImage, setSelectedImage] = useState(null);
+const CreatePostModal = ({ isOpen, onClose, onPostCreated }) => {
+  const [selectedFile, setSelectedFile] = useState(null);
   const [caption, setCaption] = useState("");
   const fileInputRef = useRef(null);
 
@@ -165,57 +186,101 @@ const CreatePostModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const handleFileSelect = (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => setSelectedImage(reader.result);
-    reader.readAsDataURL(file);
+    if (file) setSelectedFile(file);
   };
 
-  const handlePost = async () => {
-    if (!selectedImage || !caption) return alert("Add image and caption");
+  const handleSubmit = async () => {
+    if (!selectedFile || !caption) {
+      return alert("Image aur caption dono chahiye!");
+    }
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+    formData.append("caption", caption);
 
     try {
-      await api.post(
-        "/post/createPost",
-        {
-          title: "Post",
-          body: caption,
-        
+      const response = await api.post("/post/createPost", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      });
 
-      alert("Post Created ✅");
-      onClose();
-      setSelectedImage(null);
+      setSelectedFile(null);
       setCaption("");
+      onClose();
+      if (onPostCreated) onPostCreated(response.data.post);
     } catch (err) {
       console.log(err.response?.data);
+      alert("Error creating post");
     }
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/70">
-      <div className="bg-white p-6 rounded-xl w-[500px] space-y-4">
-        <input type="file" ref={fileInputRef} onChange={handleFileSelect} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="w-full max-w-md rounded-2xl bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl shadow-2xl border border-black/10 dark:border-white/10 p-6 space-y-5 animate-fadeIn">
+        
+        {/* HEADER */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Create New Post</h2>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10"
+          >
+            <X size={20} />
+          </button>
+        </div>
 
-        {selectedImage && (
-          <img src={selectedImage} className="w-full h-64 object-cover rounded" />
+        {/* IMAGE UPLOAD */}
+        <div
+          onClick={() => fileInputRef.current.click()}
+          className="border-2 border-dashed border-gray-300 dark:border-zinc-600 rounded-xl h-44 flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 cursor-pointer hover:bg-black/5 dark:hover:bg-white/10 transition"
+        >
+          <ImagePlus size={28} />
+          <p className="text-sm mt-2">Click to upload image</p>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
+
+        {/* PREVIEW */}
+        {selectedFile && (
+          <div className="relative">
+            <img
+              src={URL.createObjectURL(selectedFile)}
+              alt="preview"
+              className="w-full h-52 object-cover rounded-xl"
+            />
+          </div>
         )}
 
+        {/* CAPTION */}
         <textarea
-          placeholder="Write caption..."
+          placeholder="Write a caption..."
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
-          className="w-full border p-2 rounded"
+          className="w-full rounded-xl bg-gray-100 dark:bg-zinc-800 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none h-24"
         />
 
+        {/* ACTION BUTTONS */}
         <button
-          onClick={handlePost}
-          className="w-full bg-blue-600 text-white py-2 rounded-lg"
+          onClick={handleSubmit}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-medium transition"
         >
-          🚀 Post Now
+          Share Post 
+        </button>
+
+        <button
+          onClick={onClose}
+          className="w-full bg-gray-200 dark:bg-zinc-700 hover:bg-gray-300 dark:hover:bg-zinc-600 py-2.5 rounded-xl font-medium transition"
+        >
+          Cancel
         </button>
       </div>
     </div>

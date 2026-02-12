@@ -2,7 +2,8 @@
 const express = require("express");
 const requireLogin = require("../middleware/requirelogin");
 const Post = require("../module/post.model");
-
+const { uploadOnCloudinary } = require("../utils/cloudinary");
+const upload = require("../middleware/multer.middleware");
 const router = express.Router();
 
 // router.post("/createPost", requireLogin, async (req, res) => {
@@ -17,26 +18,50 @@ const router = express.Router();
 //     return res.status(200).json({msg:"Post Created Successfully"})
 // });
 
-router.post("/createPost", requireLogin, async (req, res) => {
-  try {
-    const { caption, image } = req.body;
+// router.post("/createPost", requireLogin, async (req, res) => {
+//   try {
+//     const { caption, image } = req.body;
 
-    if (!caption)
+//     if (!caption)
+//       return res.status(400).json({ error: "Caption & Image required" });
+
+//     const post = new Post({
+//       caption,
+  
+//       postedBy: req.user._id,
+//     });
+
+//     await post.save();
+//     res.status(201).json({ msg: "Post created", post });
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
+
+router.post("/createPost", requireLogin, upload.single("image"), async (req, res) => {
+  try {
+    const { caption } = req.body;
+
+    if (!caption || !req.file)
       return res.status(400).json({ error: "Caption & Image required" });
 
-    const post = new Post({
+    const imageUrl = await uploadOnCloudinary(req.file.path);
+
+    if (!imageUrl) return res.status(500).json({ error: "Upload failed" });
+
+    const post = await Post.create({
       caption,
-  
+      image: imageUrl,
       postedBy: req.user._id,
     });
 
-    await post.save();
     res.status(201).json({ msg: "Post created", post });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 });
-
 // router.get("/allPosts", requireLogin, async (req, res) => {
 //   // console.log(req.user)
 //   // return;
