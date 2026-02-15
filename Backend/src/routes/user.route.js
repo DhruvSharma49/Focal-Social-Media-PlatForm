@@ -1,65 +1,142 @@
 const express = require("express");
 const requireLogin = require("../middleware/requirelogin");
+const { getIO, getOnlineUsers } = require("../../socket");
 const User = require("../module/user.model");
 const Post = require("../module/post.model");
-
 
 const jwt = require("jsonwebtoken");
 const router = express.Router();
 
 // follow the user
+// router.put("/follow", requireLogin, async (req, res) => {
+//   try {
+//     const followId = req.body.followId;
+//     const result = await User.findByIdAndUpdate(
+//       followId,
+//       {
+//         $push: { followers: req.user._id },
+//       },
+//       {
+//         new: true,
+//       }
+//     );
+//     const result2 = await User.findByIdAndUpdate(
+//       req.user._id,
+//       {
+//         $push: { following: followId },
+//       },
+//       {
+//         new: true,
+//       }
+//     );
+//     return res.status(200).json({ msg: "Followers Updated", user: result2 });
+//   } catch (error) {
+//     console.log("Error", error);
+//   }
+// });
+
 router.put("/follow", requireLogin, async (req, res) => {
   try {
-    const followId = req.body.followId;
-    const result = await User.findByIdAndUpdate(
-      followId,
-      {
-        $push: { followers: req.user._id },
-      },
-      {
-        new: true,
-      },
-    );
-    const result2 = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        $push: { following: followId },
-      },
-      {
-        new: true,
-      },
-    );
-    return res.status(200).json({ msg: "Followers Updated", user: result2 });
-  } catch (error) {
-    console.log("Error", error);
+    const { followId } = req.body;
+
+    if (!followId) return res.status(400).json({ error: "followId required" });
+
+    if (followId === req.user._id.toString())
+      return res.status(400).json({ error: "Cannot follow yourself" });
+
+    const userToFollow = await User.findById(followId);
+    const currentUser = await User.findById(req.user._id);
+
+    if (!userToFollow) return res.status(404).json({ error: "User not found" });
+
+    // Already following
+    if (userToFollow.followers.includes(currentUser._id)) {
+      return res.json({ status: "following" });
+    }
+
+    // PRIVATE ACCOUNT
+    if (userToFollow.accountType === "private") {
+      if (!userToFollow.followRequests.includes(currentUser._id)) {
+        userToFollow.followRequests.push(currentUser._id);
+        await userToFollow.save();
+
+        // Socket Notification
+        const io = getIO();
+        const onlineUsers = getOnlineUsers();
+        const socketId = onlineUsers.get(followId);
+
+        if (socketId) {
+          io.to(socketId).emit("newFollowRequest", {
+            fromUser: {
+              _id: currentUser._id,
+              username: currentUser.username,
+              avatarUrl: currentUser.avatarUrl,
+            },
+          });
+        }
+      }
+
+      return res.json({ status: "requested" });
+    }
+
+    // PUBLIC ACCOUNT → Direct follow
+    userToFollow.followers.push(currentUser._id);
+    currentUser.following.push(userToFollow._id);
+
+    await userToFollow.save();
+    await currentUser.save();
+
+    return res.json({ status: "following" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 // Unfollow the user
+// router.put("/unfollow", requireLogin, async (req, res) => {
+//   try {
+//     const unfollowId = req.body.unfollowId;
+//     const result = await User.findByIdAndUpdate(
+//       unfollowId,
+//       {
+//         $pull: { followers: req.user._id },
+//       },
+//       {
+//         new: true,
+//       }
+//     );
+//     const result2 = await User.findByIdAndUpdate(
+//       req.user._id,
+//       {
+//         $pull: { following: unfollowId },
+//       },
+//       {
+//         new: true,
+//       }
+//     );
+//     return res.status(200).json({ msg: "User unfollow you" });
+//   } catch (error) {
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
+
 router.put("/unfollow", requireLogin, async (req, res) => {
   try {
-    const unfollowId = req.body.unfollowId;
-    const result = await User.findByIdAndUpdate(
-      unfollowId,
-      {
-        $pull: { followers: req.user._id },
-      },
-      {
-        new: true,
-      },
-    );
-    const result2 = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        $pull: { following: unfollowId },
-      },
-      {
-        new: true,
-      },
-    );
-    return res.status(200).json({ msg: "User unfollow you" });
-  } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    const { unfollowId } = req.body;
+
+    const userToUnfollow = await User.findById(unfollowId);
+    const currentUser = await User.findById(req.user._id);
+
+    userToUnfollow.followers.pull(currentUser._id);
+    currentUser.following.pull(unfollowId);
+
+    await userToUnfollow.save();
+    await currentUser.save();
+
+    res.json({ status: "unfollowed" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -88,43 +165,6 @@ router.get("/searchusers", requireLogin, async (req, res) => {
   }
 });
 
-//Get the all the post of that user who login
-router.get("/user/:id", requireLogin, async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id)
-      .select("-password")
-      .populate("followers", "_id name username")
-      .populate("following", "_id name username");
-
-    const posts = await Post.find({ postedBy: req.params.id });
-
-    const isOwner = req.user._id.toString() === req.params.id;
-    const isFollower = user.followers.some(
-      (f) => f._id.toString() === req.user._id.toString(),
-    );
-
-    let followersCount = user.followers.length;
-    let followingCount = user.following.length;
-
-    if (user.accountType === "private" && !isOwner && !isFollower) {
-      followersCount = user.showFollowers ? user.followers.length : 0;
-      followingCount = 0;
-    }
-
-    res.json({
-      user: {
-        ...user.toObject(),
-        followersCount,
-        followingCount,
-      },
-      posts:
-        user.accountType === "private" && !isOwner && !isFollower ? [] : posts,
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
 // Change privacy (including public/private toggle)
 router.put("/user/privacy/:id", requireLogin, async (req, res) => {
   try {
@@ -139,7 +179,7 @@ router.put("/user/privacy/:id", requireLogin, async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { $set: updateData },
-      { new: true },
+      { new: true }
     ).select("-password");
 
     res.json({ user });
@@ -164,13 +204,131 @@ router.put("/user/update-username", requireLogin, async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { username },
-      { new: true }, // Return the updated document
+      { new: true } // Return the updated document
     );
 
     res.json({ message: "Username updated", user: updatedUser });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+router.put("/approve/:userId", requireLogin, async (req, res) => {
+  try {
+    const requesterId = req.params.userId;
+
+    const currentUser = await User.findById(req.user._id);
+    const requester = await User.findById(requesterId);
+
+    if (!currentUser.followRequests.includes(requesterId)) {
+      return res.status(400).json({ error: "No request found" });
+    }
+
+    // Remove from requests
+    currentUser.followRequests.pull(requesterId);
+
+    // Add follower/following
+    if (!currentUser.followers.includes(requesterId)) {
+      currentUser.followers.push(requesterId);
+    }
+
+    if (!requester.following.includes(currentUser._id)) {
+      requester.following.push(currentUser._id);
+    }
+
+    await currentUser.save();
+    await requester.save();
+
+    res.json({ msg: "Request approved" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.put("/reject/:userId", requireLogin, async (req, res) => {
+  try {
+    const requesterId = req.params.userId;
+
+    const currentUser = await User.findById(req.user._id);
+
+    currentUser.followRequests.pull(requesterId);
+    await currentUser.save();
+
+    res.json({ msg: "Request rejected" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+
+// Get Other User Profile
+router.get("/otherprofile/:id", requireLogin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+      .select("-password")
+      .populate("followers", "_id name username")
+      .populate("following", "_id name username");
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const posts = await Post.find({ postedBy: req.params.id })
+      .populate("postedBy", "username avatarUrl")
+      .populate("comments.postedBy", "username avatarUrl")
+      .sort({ createdAt: -1 });
+
+    const isOwner =
+      req.user._id.toString() === req.params.id.toString();
+
+    const isFollower = user.followers.some(
+      (f) => f._id.toString() === req.user._id.toString()
+    );
+
+    let followersCount = user.followers.length;
+    let followingCount = user.following.length;
+
+    if (user.accountType === "private" && !isOwner && !isFollower) {
+      followersCount = user.showFollowers ? user.followers.length : 0;
+      followingCount = 0;
+    }
+
+    res.json({
+      user: {
+        ...user.toObject(),
+        followersCount,
+        followingCount,
+      },
+      posts:
+        user.accountType === "private" && !isOwner && !isFollower
+          ? []
+          : posts,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Get Logged-in User Profile
+router.get("/myprofile", requireLogin, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .select("-password")
+      .populate("followers", "_id name username")
+      .populate("following", "_id name username");
+
+    const posts = await Post.find({ postedBy: req.user._id })
+      .populate("postedBy", "username avatarUrl")
+      .populate("comments.postedBy", "username avatarUrl")
+      .sort({ createdAt: -1 });
+
+    res.json({
+      user,
+      posts,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
   }
 });
 

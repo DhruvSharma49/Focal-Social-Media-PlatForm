@@ -17,11 +17,14 @@ app.use(cookieParser());
 app.use(express.static("public"));
 
 const authRoutes = require("./src/routes/auth.route");
+const postRoutes=require("./src/routes/post.route");
+const interactRoutes=require("./src/routes/user.route");
+const storyRoute=require("./src/routes/story.route");
 
 app.use("/user", authRoutes);
-app.use("/post", require("./src/routes/post.route"));
-app.use("/interact", require("./src/routes/user.route"));
-app.use("/createstory", require("./src/routes/story.route"));
+app.use("/post",postRoutes);
+app.use("/interact",interactRoutes);
+app.use("/createstory",storyRoute);
 
 module.exports=app;
 

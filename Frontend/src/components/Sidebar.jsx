@@ -12,12 +12,18 @@ import {
 } from "lucide-react";
 import CreatePostModal from "./CreatePostModel";
 import { currentUser } from "../data/mockData";
+import { useSelector } from "react-redux";
+
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const notifications = useSelector(
+  (state) => state.notifications.list
+);
+
 
   const menuRef = useRef(null);
 
@@ -43,6 +49,7 @@ const Sidebar = () => {
     { icon: Compass, label: "Explore", path: "/explore" },
     { icon: Film, label: "Reels", path: "/reels" },
     { icon: Send, label: "Messages", path: "/messages" },
+    
     { icon: Heart, label: "Notifications", path: "/notifications" },
     { icon: PlusSquare, label: "Create", action: () => setShowCreateModal(true) },
   ];
@@ -93,7 +100,17 @@ const Sidebar = () => {
                   }
                 `}
               >
-                <link.icon className="w-6 h-6" />
+              <div className="relative">
+  <link.icon className="w-6 h-6" />
+
+  {link.label === "Notifications" && notifications.length > 0 && (
+    <>
+      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+      <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></span>
+    </>
+  )}
+</div>
+
                 <span className="hidden xl:block">{link.label}</span>
               </div>
             );

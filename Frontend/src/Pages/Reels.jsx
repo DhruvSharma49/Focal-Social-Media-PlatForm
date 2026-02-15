@@ -164,7 +164,7 @@ const Reels = () => {
 
   return (
     <div className="h-screen w-full flex items-center justify-center bg-background overflow-hidden">
-      <div className="relative h-full max-h-[900px] w-full max-w-[420px] snap-y snap-mandatory overflow-y-scroll scrollbar-hide">
+      <div className="relative h-full max-h-[900px] w-full max-w-[420px] snap-y snap-mandatory overflow-y-scroll scrollbar-hide hide-scrollbar .hide-scrollbar::-webkit-scrollbar">
         {reels.map((reel) => (
           <div
             key={reel.id}
