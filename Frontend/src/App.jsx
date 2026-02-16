@@ -18,7 +18,8 @@ import NotFound from "./Pages/NotFound";
 import AuthLayout from "./components/AuthLayout";
 import { socket } from "./utils/socket";
 import UserProfile from "./Pages/Userprofile";
-import { addNotification } from "./redux/slices/notificationSlice";
+import { addNotification,setNotifications } from "./redux/slices/notificationSlice";
+import api from "./utils/api";
 
 
 const queryClient = new QueryClient();
@@ -61,15 +62,33 @@ const { user } = useSelector((state) => state.auth);
     }
   }, [darkMode]);
 
-  useEffect(() => {
+useEffect(() => {
   if (user?._id) {
     socket.connect();
-
     socket.emit("registerUser", user._id);
+
+    // ✅ Fetch DB notifications on login
+    const fetchNotifications = async () => {
+      const res = await api.get("/interact/notifications", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+
+      const formatted = res.data.notifications.map((n) => ({
+        _id: n._id,
+        type: n.type,
+        message: "sent you a follow request",
+        user: n.from,
+      }));
+
+      dispatch(setNotifications(formatted));
+    };
+
+    fetchNotifications();
 
     socket.on("newFollowRequest", (data) => {
       dispatch(
         addNotification({
+          _id: data._id,
           type: "followRequest",
           message: "sent you a follow request",
           user: data.fromUser,
@@ -82,6 +101,7 @@ const { user } = useSelector((state) => state.auth);
     socket.off("newFollowRequest");
   };
 }, [user]);
+
 
 
   return (

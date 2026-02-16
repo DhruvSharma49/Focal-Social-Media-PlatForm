@@ -3,9 +3,9 @@ const requireLogin = require("../middleware/requirelogin");
 const { getIO, getOnlineUsers } = require("../../socket");
 const User = require("../module/user.model");
 const Post = require("../module/post.model");
-
-const jwt = require("jsonwebtoken");
 const router = express.Router();
+
+const Notification = require("../module/notification.model");
 
 // follow the user
 // router.put("/follow", requireLogin, async (req, res) => {
@@ -60,18 +60,27 @@ router.put("/follow", requireLogin, async (req, res) => {
         userToFollow.followRequests.push(currentUser._id);
         await userToFollow.save();
 
-        // Socket Notification
+        // ✅ 1. SAVE IN DB
+        const newNotification = await Notification.create({
+          to: userToFollow._id,
+          from: currentUser._id,
+          type: "followRequest",
+        });
+
+        // ✅ 2. SEND REALTIME IF ONLINE
         const io = getIO();
         const onlineUsers = getOnlineUsers();
         const socketId = onlineUsers.get(followId);
 
         if (socketId) {
           io.to(socketId).emit("newFollowRequest", {
+            _id: newNotification._id,
             fromUser: {
               _id: currentUser._id,
               username: currentUser.username,
               avatarUrl: currentUser.avatarUrl,
             },
+            type: "followRequest",
           });
         }
       }
@@ -94,33 +103,6 @@ router.put("/follow", requireLogin, async (req, res) => {
 });
 
 // Unfollow the user
-// router.put("/unfollow", requireLogin, async (req, res) => {
-//   try {
-//     const unfollowId = req.body.unfollowId;
-//     const result = await User.findByIdAndUpdate(
-//       unfollowId,
-//       {
-//         $pull: { followers: req.user._id },
-//       },
-//       {
-//         new: true,
-//       }
-//     );
-//     const result2 = await User.findByIdAndUpdate(
-//       req.user._id,
-//       {
-//         $pull: { following: unfollowId },
-//       },
-//       {
-//         new: true,
-//       }
-//     );
-//     return res.status(200).json({ msg: "User unfollow you" });
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// });
-
 router.put("/unfollow", requireLogin, async (req, res) => {
   try {
     const { unfollowId } = req.body;
@@ -221,14 +203,8 @@ router.put("/approve/:userId", requireLogin, async (req, res) => {
     const currentUser = await User.findById(req.user._id);
     const requester = await User.findById(requesterId);
 
-    if (!currentUser.followRequests.includes(requesterId)) {
-      return res.status(400).json({ error: "No request found" });
-    }
-
-    // Remove from requests
     currentUser.followRequests.pull(requesterId);
 
-    // Add follower/following
     if (!currentUser.followers.includes(requesterId)) {
       currentUser.followers.push(requesterId);
     }
@@ -240,7 +216,17 @@ router.put("/approve/:userId", requireLogin, async (req, res) => {
     await currentUser.save();
     await requester.save();
 
-    res.json({ msg: "Request approved" });
+    // 🔥 IMPORTANT CHANGE
+    const deletedNotification = await Notification.findOneAndDelete({
+      to: currentUser._id,
+      from: requesterId,
+      type: "followRequest",
+    });
+
+    res.json({
+      msg: "Request approved",
+      deletedNotificationId: deletedNotification?._id,
+    });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
@@ -255,12 +241,18 @@ router.put("/reject/:userId", requireLogin, async (req, res) => {
     currentUser.followRequests.pull(requesterId);
     await currentUser.save();
 
-    res.json({ msg: "Request rejected" });
+    // DELETE notification from DB
+    await Notification.deleteOne({
+      to: currentUser._id,
+      from: requesterId,
+      type: "followRequest",
+    });
+
+    res.json({ msg: "Request rejected", requesterId });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 // Get Other User Profile
 router.get("/otherprofile/:id", requireLogin, async (req, res) => {
@@ -279,8 +271,7 @@ router.get("/otherprofile/:id", requireLogin, async (req, res) => {
       .populate("comments.postedBy", "username avatarUrl")
       .sort({ createdAt: -1 });
 
-    const isOwner =
-      req.user._id.toString() === req.params.id.toString();
+    const isOwner = req.user._id.toString() === req.params.id.toString();
 
     const isFollower = user.followers.some(
       (f) => f._id.toString() === req.user._id.toString()
@@ -301,9 +292,7 @@ router.get("/otherprofile/:id", requireLogin, async (req, res) => {
         followingCount,
       },
       posts:
-        user.accountType === "private" && !isOwner && !isFollower
-          ? []
-          : posts,
+        user.accountType === "private" && !isOwner && !isFollower ? [] : posts,
     });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
@@ -327,6 +316,21 @@ router.get("/myprofile", requireLogin, async (req, res) => {
       user,
       posts,
     });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get("/notifications", requireLogin, async (req, res) => {
+  try {
+    const notifications = await Notification.find({
+      to: req.user._id,
+      isRead: false,
+    })
+      .populate("from", "username avatarUrl")
+      .sort({ createdAt: -1 });
+
+    res.json({ notifications });
   } catch (err) {
     res.status(500).json({ error: "Server error" });
   }

@@ -173,7 +173,7 @@ const ProfilePostModal = ({ post, onClose, currentUser, setUserPosts }) => {
                 <div key={c._id} className="text-sm">
                   <span
                     onClick={() =>
-                      navigate(`/profile/${c?.postedBy?._id}`)
+                      navigate(`/otherprofile/${c?.postedBy?._id}`)
                     }
                     className="font-semibold mr-2 cursor-pointer hover:opacity-70"
                   >

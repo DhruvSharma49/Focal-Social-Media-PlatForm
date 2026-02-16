@@ -6,11 +6,11 @@ module.exports = async (req, res, next) => {
   if (!authorization) {
     return res.status(401).json({ error: "You must be logged in" });
   }
-  console.log("authorization", authorization);
+  // console.log("authorization", authorization);
   const token = authorization.replace("Bearer ", "");
-     console.log("token",token)
+    //  console.log("token",token)
   const tokenisVerifedOrNot = jwt.verify(token, process.env.SECRET_KEY);
-  console.log(tokenisVerifedOrNot);
+  // console.log(tokenisVerifedOrNot);
   req.user = tokenisVerifedOrNot.user;
   next();
 };

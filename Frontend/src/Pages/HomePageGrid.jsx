@@ -1,4 +1,4 @@
-import Feed from "../components/Feed";
+import Feed from "../Pages/Feed";
 import RightSidebar from "../components/RightSidebar";
 
 const Index = () => {

@@ -2,6 +2,7 @@ const express = require("express");
 const requireLogin = require("../middleware/requirelogin");
 const Post = require("../module/post.model");
 const { uploadOnCloudinary, deleteFromCloudinary } = require("../utils/cloudinary");
+const User=require("../module/user.model")
 const upload = require("../middleware/multer.middleware");
 const router = express.Router();
 
@@ -134,6 +135,28 @@ router.get("/randomposts", requireLogin, async (req, res) => {
     res.json({ posts: populatedPosts });
   } catch (err) {
     console.error("Explore posts error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get("/feed", requireLogin, async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.user._id);
+
+    const posts = await Post.find({
+      postedBy: { $in: currentUser.following },
+    })
+      .populate("postedBy", "username avatarUrl")
+      .populate("comments.postedBy", "username avatarUrl")
+      .sort({ createdAt: -1 });
+
+    console.log("Following:", currentUser.following);
+    console.log("Posts found:", posts.length);
+
+    res.json({ posts });
+
+  } catch (err) {
+    console.error("Feed error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
