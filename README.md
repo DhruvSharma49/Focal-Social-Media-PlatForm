@@ -142,135 +142,102 @@
 
 ```
 focal/
-├── 📂 client/                          # React Frontend
+├── 📂 Backend/                               # Node.js / Express Backend
+│   ├── 📂 node_modules/
 │   ├── 📂 public/
-│   │   └── focal-logo.svg
+│   │   └── 📂 temp/
+│   │       └── .gitkeep                      # Temp folder for multer uploads
 │   ├── 📂 src/
-│   │   ├── 📂 api/                     # Axios instances & API calls
-│   │   │   ├── axiosInstance.js
-│   │   │   ├── authApi.js
-│   │   │   ├── postApi.js
-│   │   │   ├── userApi.js
-│   │   │   └── messageApi.js
-│   │   ├── 📂 assets/                  # Static images, icons
-│   │   ├── 📂 components/              # Reusable UI components
-│   │   │   ├── 📂 auth/
-│   │   │   │   ├── LoginForm.jsx
-│   │   │   │   └── RegisterForm.jsx
-│   │   │   ├── 📂 common/
-│   │   │   │   ├── Avatar.jsx
-│   │   │   │   ├── Button.jsx
-│   │   │   │   ├── Modal.jsx
-│   │   │   │   ├── Loader.jsx
-│   │   │   │   ├── Skeleton.jsx
-│   │   │   │   └── Toast.jsx
-│   │   │   ├── 📂 layout/
-│   │   │   │   ├── Sidebar.jsx
-│   │   │   │   ├── Navbar.jsx
-│   │   │   │   ├── MobileNav.jsx
-│   │   │   │   └── RightSidebar.jsx
-│   │   │   ├── 📂 post/
-│   │   │   │   ├── PostCard.jsx
-│   │   │   │   ├── PostModal.jsx
-│   │   │   │   ├── PostActions.jsx
-│   │   │   │   ├── CreatePost.jsx
-│   │   │   │   └── PostGrid.jsx
-│   │   │   ├── 📂 story/
-│   │   │   │   ├── StoryCircle.jsx
-│   │   │   │   ├── StoryViewer.jsx
-│   │   │   │   └── CreateStory.jsx
-│   │   │   ├── 📂 comment/
-│   │   │   │   ├── CommentList.jsx
-│   │   │   │   └── CommentInput.jsx
-│   │   │   ├── 📂 message/
-│   │   │   │   ├── ChatList.jsx
-│   │   │   │   ├── ChatWindow.jsx
-│   │   │   │   └── MessageBubble.jsx
-│   │   │   └── 📂 notification/
-│   │   │       └── NotificationItem.jsx
-│   │   ├── 📂 hooks/                   # Custom React hooks
-│   │   │   ├── useAuth.js
-│   │   │   ├── useSocket.js
-│   │   │   ├── useInfiniteScroll.js
-│   │   │   └── useDebounce.js
-│   │   ├── 📂 pages/                   # Route-level page components
-│   │   │   ├── HomePage.jsx
-│   │   │   ├── LoginPage.jsx
-│   │   │   ├── RegisterPage.jsx
-│   │   │   ├── ProfilePage.jsx
-│   │   │   ├── ExplorePage.jsx
-│   │   │   ├── MessagesPage.jsx
-│   │   │   ├── NotificationsPage.jsx
-│   │   │   ├── SavedPostsPage.jsx
-│   │   │   └── NotFoundPage.jsx
-│   │   ├── 📂 redux/                   # Redux Toolkit store
-│   │   │   ├── store.js
-│   │   │   └── 📂 slices/
-│   │   │       ├── authSlice.js
-│   │   │       ├── postSlice.js
-│   │   │       ├── userSlice.js
-│   │   │       ├── messageSlice.js
-│   │   │       ├── notificationSlice.js
-│   │   │       └── uiSlice.js
-│   │   ├── 📂 socket/
-│   │   │   └── socket.js               # Socket.IO client setup
+│   │   ├── 📂 DataBase/
+│   │   │   └── connection.db.js              # MongoDB Atlas connection setup
+│   │   ├── 📂 middleware/
+│   │   │   ├── multer.middleware.js          # Multer config (memoryStorage)
+│   │   │   └── requirelogin.js              # JWT auth guard middleware
+│   │   ├── 📂 module/                        # Mongoose models
+│   │   │   ├── notification.model.js
+│   │   │   ├── post.model.js
+│   │   │   ├── story.model.js
+│   │   │   └── user.model.js
+│   │   ├── 📂 routes/
+│   │   │   ├── auth.route.js                # Register / Login / Logout
+│   │   │   ├── post.route.js                # CRUD posts, likes, saves
+│   │   │   ├── privacy.route.js             # Account privacy settings
+│   │   │   ├── story.route.js               # Story upload & view
+│   │   │   └── user.route.js                # Profile, follow, search
+│   │   └── 📂 utils/
+│   │       ├── ApiError.js                  # Custom error class
+│   │       ├── ApiResponse.js               # Standardized API response
+│   │       ├── asyncHandler.js              # Async try/catch wrapper
+│   │       ├── cloudinary.js                # Cloudinary upload helper
+│   │       └── password.js                  # bcrypt hash & compare
+│   ├── .env                                  # Environment variables
+│   ├── .gitignore
+│   ├── .prettierignore
+│   ├── .prettierrc
+│   ├── app.js                               # Express app & middleware setup
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── server.js                            # HTTP server entry point
+│   └── socket.js                            # Socket.IO server events
+│
+├── 📂 Frontend/                              # React + Vite Frontend
+│   ├── 📂 src/
+│   │   ├── 📂 assets/                        # Static images, SVGs, icons
+│   │   ├── 📂 components/                    # Reusable UI components
+│   │   │   ├── AuthLayout.jsx               # Wrapper for auth pages
+│   │   │   ├── CreatePostModel.jsx          # Create post modal
+│   │   │   ├── FeedPost.jsx                 # Individual feed post card
+│   │   │   ├── FollowFollwersModel.jsx      # Followers/Following modal
+│   │   │   ├── HomePageLayout.jsx           # Home page layout wrapper
+│   │   │   ├── NavLink.jsx                  # Sidebar navigation link item
+│   │   │   ├── NotFound.jsx                 # 404 component
+│   │   │   ├── PostFullScreenModal.jsx      # Full-screen post detail modal
+│   │   │   ├── RequireAuth.jsx              # Protected route wrapper
+│   │   │   ├── RightSidebar.jsx             # Suggested users sidebar
+│   │   │   ├── Sidebar.jsx                  # Main left navigation sidebar
+│   │   │   ├── Stories.jsx                  # Stories row on home feed
+│   │   │   ├── StoryRing.jsx                # Circular story avatar ring
+│   │   │   ├── StoryViewers.jsx             # Story viewers list
+│   │   │   └── UserPostGrid.jsx             # Profile page post grid
+│   │   ├── 📂 data/
+│   │   │   └── mockData.js                  # Static mock data for dev/testing
+│   │   ├── 📂 Pages/                         # Route-level page components
+│   │   │   ├── About.jsx
+│   │   │   ├── EditProfile.jsx
+│   │   │   ├── Expore.jsx                   # Explore / Discover page
+│   │   │   ├── Feed.jsx                     # Main home feed
+│   │   │   ├── Help.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Message.jsx                  # Direct messages page
+│   │   │   ├── Notification.jsx
+│   │   │   ├── PrivacySetting.jsx
+│   │   │   ├── Profile.jsx                  # Current user profile
+│   │   │   ├── Reels.jsx
+│   │   │   ├── Search.jsx
+│   │   │   ├── Settings.jsx
+│   │   │   ├── Signup.jsx
+│   │   │   └── Userprofile.jsx              # Other user's public profile
+│   │   ├── 📂 redux/                         # Redux Toolkit state management
+│   │   │   ├── 📂 slices/                    # Feature slices (auth, post, etc.)
+│   │   │   └── store.js                     # Redux store configuration
 │   │   ├── 📂 utils/
-│   │   │   ├── formatDate.js
-│   │   │   ├── formatCount.js
-│   │   │   └── validators.js
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
+│   │   │   ├── api.jsx                      # Axios instance & API helpers
+│   │   │   ├── Authheader.jsx               # Auth header utility
+│   │   │   └── socket.js                    # Socket.IO client setup
+│   │   ├── App.css
+│   │   ├── App.jsx                          # Root component & routes
+│   │   ├── index.css
+│   │   └── main.jsx                         # React DOM entry point
+│   ├── .env
+│   ├── .gitignore
+│   ├── eslint.config.js
 │   ├── index.html
-│   ├── tailwind.config.js
-│   ├── vite.config.js
-│   └── package.json
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── README.md
+│   └── vite.config.js
 │
-├── 📂 server/                          # Node.js / Express Backend
-│   ├── 📂 config/
-│   │   ├── db.js                       # MongoDB Atlas connection
-│   │   └── cloudinary.js               # Cloudinary configuration
-│   ├── 📂 controllers/
-│   │   ├── auth.controller.js
-│   │   ├── user.controller.js
-│   │   ├── post.controller.js
-│   │   ├── comment.controller.js
-│   │   ├── story.controller.js
-│   │   ├── message.controller.js
-│   │   └── notification.controller.js
-│   ├── 📂 middleware/
-│   │   ├── auth.middleware.js          # JWT verification
-│   │   ├── upload.middleware.js        # Multer config
-│   │   └── error.middleware.js         # Global error handler
-│   ├── 📂 models/
-│   │   ├── User.model.js
-│   │   ├── Post.model.js
-│   │   ├── Comment.model.js
-│   │   ├── Story.model.js
-│   │   ├── Message.model.js
-│   │   ├── Conversation.model.js
-│   │   └── Notification.model.js
-│   ├── 📂 routes/
-│   │   ├── auth.routes.js
-│   │   ├── user.routes.js
-│   │   ├── post.routes.js
-│   │   ├── comment.routes.js
-│   │   ├── story.routes.js
-│   │   ├── message.routes.js
-│   │   └── notification.routes.js
-│   ├── 📂 socket/
-│   │   └── socket.js                  # Socket.IO server events
-│   ├── 📂 utils/
-│   │   ├── generateToken.js
-│   │   ├── cloudinaryUpload.js
-│   │   └── ApiError.js
-│   ├── app.js                         # Express app setup
-│   ├── server.js                      # HTTP + Socket.IO server entry
-│   └── package.json
-│
-├── .gitignore
-├── README.md
-└── LICENSE
+└── README.md                                 # ← You are here
 ```
 
 ---
@@ -301,17 +268,17 @@ cd focal
 ### 2. Backend Setup
 
 ```bash
-# Navigate to server directory
-cd server
+# Navigate to the Backend directory
+cd Backend
 
 # Install dependencies
 npm install
 
-# Create environment file
+# Create your environment file
 cp .env.example .env
 # → Fill in your values (see Environment Variables section below)
 
-# Start the development server
+# Start the development server with nodemon
 npm run dev
 ```
 
@@ -320,13 +287,13 @@ The backend server will start on **http://localhost:5000**
 ### 3. Frontend Setup
 
 ```bash
-# Open a new terminal and navigate to client
-cd client
+# Open a new terminal and navigate to Frontend
+cd Frontend
 
 # Install dependencies
 npm install
 
-# Start the React development server
+# Start the React + Vite development server
 npm run dev
 ```
 
@@ -334,7 +301,7 @@ The frontend will be available at **http://localhost:5173**
 
 ### 4. Environment Variables
 
-#### Server (`server/.env`)
+#### Server (`Backend/.env`)
 
 ```env
 # ─── Server ───────────────────────────────────────────────
@@ -357,7 +324,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 CLIENT_URL=http://localhost:5173
 ```
 
-#### Client (`client/.env`)
+#### Client (`Frontend/.env`)
 
 ```env
 VITE_API_BASE_URL=http://localhost:5000/api
@@ -392,17 +359,18 @@ VITE_SOCKET_URL=http://localhost:5000
 ## 🔌 API Documentation
 
 > **Base URL:** `http://localhost:5000/api`  
-> **Protected routes** require an `Authorization: Bearer <token>` header.
+> **Protected routes** require an `Authorization: Bearer <token>` header (verified by `requirelogin.js` middleware).
 
 ---
 
 ### Auth Routes
+**File:** `Backend/src/routes/auth.route.js`
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|:---:|
 | `POST` | `/auth/register` | Register a new user | ❌ |
-| `POST` | `/auth/login` | Login and receive JWT | ❌ |
-| `POST` | `/auth/logout` | Logout user | ✅ |
+| `POST` | `/auth/login` | Login and receive JWT token | ❌ |
+| `POST` | `/auth/logout` | Logout and invalidate session | ✅ |
 | `GET` | `/auth/me` | Get current authenticated user | ✅ |
 
 **Example — Register**
@@ -437,32 +405,35 @@ Content-Type: application/json
 ---
 
 ### User Routes
+**File:** `Backend/src/routes/user.route.js`
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|:---:|
 | `GET` | `/users/:username` | Get user profile by username | ✅ |
 | `PUT` | `/users/profile` | Update current user profile | ✅ |
-| `PUT` | `/users/avatar` | Update profile picture | ✅ |
-| `POST` | `/users/:id/follow` | Follow / Unfollow a user | ✅ |
+| `PUT` | `/users/avatar` | Update profile picture (multipart) | ✅ |
+| `POST` | `/users/:id/follow` | Follow / Unfollow a user (toggle) | ✅ |
 | `GET` | `/users/:id/followers` | Get user's followers list | ✅ |
 | `GET` | `/users/:id/following` | Get user's following list | ✅ |
-| `GET` | `/users/search?q=query` | Search users by name/username | ✅ |
-| `GET` | `/users/:id/saved` | Get saved posts of current user | ✅ |
+| `GET` | `/users/search?q=query` | Search users by name or username | ✅ |
+| `GET` | `/users/:id/saved` | Get current user's saved posts | ✅ |
 
 ---
 
 ### Post Routes
+**File:** `Backend/src/routes/post.route.js`
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|:---:|
-| `GET` | `/posts/feed` | Get paginated feed posts | ✅ |
-| `GET` | `/posts/explore` | Get explore page posts | ✅ |
+| `GET` | `/posts/feed` | Get paginated home feed posts | ✅ |
 | `POST` | `/posts` | Create a new post (multipart) | ✅ |
 | `GET` | `/posts/:id` | Get single post by ID | ✅ |
-| `DELETE` | `/posts/:id` | Delete a post | ✅ |
-| `POST` | `/posts/:id/like` | Like / Unlike a post | ✅ |
-| `POST` | `/posts/:id/save` | Save / Unsave a post | ✅ |
-| `GET` | `/posts/user/:userId` | Get all posts by a user | ✅ |
+| `DELETE` | `/posts/:id` | Delete your own post | ✅ |
+| `POST` | `/posts/:id/like` | Like / Unlike a post (toggle) | ✅ |
+| `POST` | `/posts/:id/save` | Save / Unsave a post (toggle) | ✅ |
+| `GET` | `/posts/user/:userId` | Get all posts by a specific user | ✅ |
+| `POST` | `/posts/:id/comment` | Add a comment to a post | ✅ |
+| `DELETE` | `/posts/:id/comment/:commentId` | Delete a comment | ✅ |
 
 **Example — Create Post**
 ```
@@ -472,72 +443,62 @@ Authorization: Bearer <token>
 
 Fields:
   caption: "Golden hour 🌅 #photography #nature"
-  images: [file1.jpg, file2.jpg]   ← up to 10 files
+  images: [file1.jpg, file2.jpg]
 ```
 
 ---
 
-### Comment Routes
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|:---:|
-| `GET` | `/comments/:postId` | Get comments for a post | ✅ |
-| `POST` | `/comments/:postId` | Add a comment | ✅ |
-| `PUT` | `/comments/:id` | Edit your comment | ✅ |
-| `DELETE` | `/comments/:id` | Delete a comment | ✅ |
-| `POST` | `/comments/:id/like` | Like / Unlike a comment | ✅ |
-| `POST` | `/comments/:id/reply` | Reply to a comment | ✅ |
-
----
-
 ### Story Routes
+**File:** `Backend/src/routes/story.route.js`
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|:---:|
 | `GET` | `/stories/feed` | Get stories of followed users | ✅ |
 | `POST` | `/stories` | Upload a new story (multipart) | ✅ |
-| `GET` | `/stories/:id` | Get a single story | ✅ |
-| `DELETE` | `/stories/:id` | Delete your story | ✅ |
-| `POST` | `/stories/:id/view` | Mark story as viewed | ✅ |
-| `GET` | `/stories/:id/viewers` | Get list of story viewers | ✅ |
+| `DELETE` | `/stories/:id` | Delete your own story | ✅ |
+| `POST` | `/stories/:id/view` | Mark a story as viewed | ✅ |
+| `GET` | `/stories/:id/viewers` | Get list of viewers for your story | ✅ |
 
 ---
 
-### Message Routes
+### Privacy Routes
+**File:** `Backend/src/routes/privacy.route.js`
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|:---:|
-| `GET` | `/messages/conversations` | Get all conversations | ✅ |
-| `GET` | `/messages/:conversationId` | Get messages in a conversation | ✅ |
-| `POST` | `/messages/:conversationId` | Send a message | ✅ |
-| `DELETE` | `/messages/:id` | Delete a message | ✅ |
-| `POST` | `/messages/conversation/new` | Start a new conversation | ✅ |
+| `GET` | `/privacy` | Get current privacy settings | ✅ |
+| `PUT` | `/privacy/account` | Toggle public / private account | ✅ |
+| `PUT` | `/privacy/activity` | Update activity status visibility | ✅ |
 
 ---
 
 ### Notification Routes
+**File:** Uses `notification.model.js` — triggered by Socket.IO events
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|:---:|
-| `GET` | `/notifications` | Get all notifications | ✅ |
-| `PUT` | `/notifications/:id/read` | Mark notification as read | ✅ |
-| `PUT` | `/notifications/read-all` | Mark all as read | ✅ |
+| `GET` | `/notifications` | Get all notifications for user | ✅ |
+| `PUT` | `/notifications/:id/read` | Mark a notification as read | ✅ |
+| `PUT` | `/notifications/read-all` | Mark all notifications as read | ✅ |
 | `DELETE` | `/notifications/:id` | Delete a notification | ✅ |
 
 ---
 
 ## 🗄️ Database Schema
 
-### User Model
+> Models live in `Backend/src/module/`
+
+### User Model — `user.model.js`
 ```javascript
 {
   username:       { type: String, unique: true, required: true },
   email:          { type: String, unique: true, required: true },
-  password:       { type: String, required: true },             // bcrypt hashed
+  password:       { type: String, required: true },             // bcrypt hashed via password.js
   fullName:       { type: String, required: true },
   avatar:         { type: String, default: '' },                // Cloudinary URL
   bio:            { type: String, maxlength: 150 },
   website:        { type: String },
+  gender:         { type: String, enum: ['male', 'female', 'prefer_not_to_say'] },
   isPrivate:      { type: Boolean, default: false },
   followers:      [{ type: ObjectId, ref: 'User' }],
   following:      [{ type: ObjectId, ref: 'User' }],
@@ -546,73 +507,47 @@ Fields:
 }
 ```
 
-### Post Model
+### Post Model — `post.model.js`
 ```javascript
 {
   author:         { type: ObjectId, ref: 'User', required: true },
-  images:         [{ url: String, publicId: String }],          // Cloudinary
+  images:         [{ url: String, publicId: String }],          // Cloudinary URLs
   caption:        { type: String, maxlength: 2200 },
   hashtags:       [String],
   mentions:       [{ type: ObjectId, ref: 'User' }],
   likes:          [{ type: ObjectId, ref: 'User' }],
-  comments:       [{ type: ObjectId, ref: 'Comment' }],
+  comments:       [{
+    user:           { type: ObjectId, ref: 'User' },
+    text:           String,
+    createdAt:      Date
+  }],
   location:       { type: String },
   timestamps:     true
 }
 ```
 
-### Comment Model
-```javascript
-{
-  post:           { type: ObjectId, ref: 'Post', required: true },
-  author:         { type: ObjectId, ref: 'User', required: true },
-  text:           { type: String, required: true, maxlength: 1000 },
-  likes:          [{ type: ObjectId, ref: 'User' }],
-  parentComment:  { type: ObjectId, ref: 'Comment', default: null },
-  replies:        [{ type: ObjectId, ref: 'Comment' }],
-  timestamps:     true
-}
-```
-
-### Story Model
+### Story Model — `story.model.js`
 ```javascript
 {
   author:         { type: ObjectId, ref: 'User', required: true },
-  media:          { url: String, publicId: String, type: { type: String, enum: ['image','video'] } },
+  media:          {
+    url:            String,                                      // Cloudinary URL
+    publicId:       String,
+    type:           { type: String, enum: ['image', 'video'] }
+  },
   viewers:        [{ user: ObjectId, viewedAt: Date }],
-  expiresAt:      { type: Date, default: () => Date.now() + 24*60*60*1000 },
+  expiresAt:      { type: Date, default: () => Date.now() + 24 * 60 * 60 * 1000 },
   timestamps:     true
 }
 ```
 
-### Message & Conversation Models
-```javascript
-// Conversation
-{
-  participants:   [{ type: ObjectId, ref: 'User' }],
-  lastMessage:    { type: ObjectId, ref: 'Message' },
-  timestamps:     true
-}
-
-// Message
-{
-  conversation:   { type: ObjectId, ref: 'Conversation' },
-  sender:         { type: ObjectId, ref: 'User', required: true },
-  text:           { type: String },
-  post:           { type: ObjectId, ref: 'Post' },              // shared post
-  readBy:         [{ type: ObjectId, ref: 'User' }],
-  timestamps:     true
-}
-```
-
-### Notification Model
+### Notification Model — `notification.model.js`
 ```javascript
 {
   recipient:      { type: ObjectId, ref: 'User', required: true },
   sender:         { type: ObjectId, ref: 'User', required: true },
-  type:           { type: String, enum: ['like', 'comment', 'follow', 'mention', 'reply'] },
+  type:           { type: String, enum: ['like', 'comment', 'follow', 'mention'] },
   post:           { type: ObjectId, ref: 'Post' },
-  comment:        { type: ObjectId, ref: 'Comment' },
   isRead:         { type: Boolean, default: false },
   timestamps:     true
 }
@@ -622,43 +557,48 @@ Fields:
 
 ## 🔒 Authentication & Security
 
-Focal uses a **JWT-based stateless authentication** flow:
+Focal uses a **JWT-based stateless authentication** flow powered by `requirelogin.js` and `password.js`:
 
-1. User registers or logs in → server validates credentials with **bcryptjs** (`cost factor: 12`)
-2. Server signs a **JWT** (`HS256`) with the user's `_id` and an expiry
-3. Client stores the token in `localStorage` (or `httpOnly` cookie for production)
-4. Every protected API request sends `Authorization: Bearer <token>`
-5. The `auth.middleware.js` verifies and decodes the token on every request
+1. User registers → password is hashed with **bcryptjs** (`cost factor: 12`) via `Backend/src/utils/password.js`
+2. Server signs a **JWT** with the user's `_id` and an expiry
+3. Client stores the token and sends it via `Authheader.jsx` utility on every request
+4. `Backend/src/middleware/requirelogin.js` verifies the token and attaches `req.user` on every protected route
+5. Standardized responses use `ApiResponse.js` and errors use `ApiError.js` for consistent API output
+6. All async route handlers are wrapped with `asyncHandler.js` to eliminate try/catch boilerplate
 
 **Security measures implemented:**
 - Passwords hashed with `bcryptjs` (salt rounds: 12)
-- JWT expiry and refresh strategy
-- Input validation and sanitization
-- CORS configured to allow only the client origin
-- Helmet.js for secure HTTP headers
-- Rate limiting on auth routes
-- Multer file type and size validation
+- JWT expiry configurable via `JWT_EXPIRES_IN` env variable
+- Input validation and sanitization on all routes
+- CORS configured to allow only the `CLIENT_URL` origin
+- Multer file type and size validation before Cloudinary upload
+- `.env` excluded from version control via `.gitignore`
 
 ---
 
 ## ☁️ Media Upload (Cloudinary + Multer)
 
-Focal uses a two-step upload pipeline:
+Focal uses a two-step upload pipeline configured in `multer.middleware.js` and `cloudinary.js`:
 
 ```
-Client (file)  →  Multer (memory storage)  →  Cloudinary  →  URL saved to MongoDB
+Client (file)  →  multer.middleware.js (diskStorage → public/temp/)  →  cloudinary.js  →  URL saved to MongoDB
 ```
 
-**Multer** is configured with `memoryStorage()` to hold the file buffer in memory temporarily. The buffer is then streamed directly to **Cloudinary** using a upload stream, avoiding any disk I/O on the server.
+**Multer** is configured with `diskStorage` saving files temporarily to `Backend/public/temp/` (the `.gitkeep` preserves this folder in git). After a successful Cloudinary upload, the temp file is deleted automatically.
 
 ```javascript
-// upload.middleware.js (simplified)
+// multer.middleware.js (simplified)
 const multer = require('multer');
-const storage = multer.memoryStorage();
+const path = require('path');
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, './public/temp'),
+  filename:    (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
+});
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 },        // 10MB max
+  limits: { fileSize: 10 * 1024 * 1024 },          // 10MB max
   fileFilter: (req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4'];
     cb(null, allowed.includes(file.mimetype));
@@ -716,18 +656,21 @@ Client A ─── socket.emit('sendMessage') ───► Server
 
 ## 🧠 State Management (Redux Toolkit)
 
-The client uses **Redux Toolkit** for global state management.
+The client uses **Redux Toolkit** for global state management. The store is configured in `Frontend/src/redux/store.js` with feature slices in `Frontend/src/redux/slices/`.
 
 | Slice | State Managed |
 |-------|--------------|
-| `authSlice` | Current user, token, auth loading/error states |
-| `postSlice` | Feed posts, explore posts, individual post cache |
-| `userSlice` | Visited profiles, search results |
-| `messageSlice` | Conversations list, active chat messages |
-| `notificationSlice` | Notifications list, unread count |
-| `uiSlice` | Modal states, dark mode, sidebar open/close |
+| `authSlice` | Current user, JWT token, login/logout state |
+| `postSlice` | Feed posts, explore posts, post detail cache |
+| `userSlice` | Visited profiles, search results, follow state |
+| `storySlice` | Story feed, viewed stories |
+| `notificationSlice` | Notifications list and unread count |
+| `uiSlice` | Modal open/close, sidebar state, dark mode |
 
-**RTK Query** is used for data fetching with automatic caching, refetching on focus, and optimistic updates for actions like liking/saving posts.
+**Frontend Utils:**
+- `Frontend/src/utils/api.jsx` — Axios instance pre-configured with `baseURL` from `.env` and auth header injection
+- `Frontend/src/utils/Authheader.jsx` — Returns `{ Authorization: Bearer <token> }` header for API calls
+- `Frontend/src/utils/socket.js` — Initializes and exports the Socket.IO client singleton
 
 ---
 
