@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Login from "./Pages/Login";
 import Signup from "./Pages/Signup";
 import Sidebar from "./components/Sidebar";
-import Index from "./Pages/HomePageGrid";
+import Index from "./components/HomePageLayout";
 import Search from "./Pages/Search";
 import Explore from "./Pages/Expore";
 import Reels from "./Pages/Reels";
@@ -14,13 +14,16 @@ import Messages from "./Pages/Message";
 import Notifications from "./Pages/Notification";
 import Profile from "./Pages/Profile";
 import Settings from "./Pages/Settings";
-import NotFound from "./Pages/NotFound";
+import NotFound from "./components/NotFound";
 import AuthLayout from "./components/AuthLayout";
 import { socket } from "./utils/socket";
 import UserProfile from "./Pages/Userprofile";
-import { addNotification,setNotifications } from "./redux/slices/notificationSlice";
+import Protected from "./components/RequireAuth";
+import {
+  addNotification,
+  setNotifications,
+} from "./redux/slices/notificationSlice";
 import api from "./utils/api";
-
 
 const queryClient = new QueryClient();
 
@@ -36,8 +39,7 @@ const MainLayout = ({ children, showSidebar = true }) => (
 const App = () => {
   const [darkMode, setDarkMode] = useState(false);
   const dispatch = useDispatch();
-const { user } = useSelector((state) => state.auth);
-
+  const { user } = useSelector((state) => state.auth);
 
   // First load: apply saved theme instantly
   useEffect(() => {
@@ -62,149 +64,161 @@ const { user } = useSelector((state) => state.auth);
     }
   }, [darkMode]);
 
-useEffect(() => {
-  if (user?._id) {
-    socket.connect();
-    socket.emit("registerUser", user._id);
+  useEffect(() => {
+    if (user?._id) {
+      socket.connect();
+      socket.emit("registerUser", user._id);
 
-    // ✅ Fetch DB notifications on login
-    const fetchNotifications = async () => {
-      const res = await api.get("/interact/notifications", {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      // ✅ Fetch DB notifications on login
+      const fetchNotifications = async () => {
+        const res = await api.get("/interact/notifications", {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
 
-      const formatted = res.data.notifications.map((n) => ({
-        _id: n._id,
-        type: n.type,
-        message: "sent you a follow request",
-        user: n.from,
-      }));
-
-      dispatch(setNotifications(formatted));
-    };
-
-    fetchNotifications();
-
-    socket.on("newFollowRequest", (data) => {
-      dispatch(
-        addNotification({
-          _id: data._id,
-          type: "followRequest",
+        const formatted = res.data.notifications.map((n) => ({
+          _id: n._id,
+          type: n.type,
           message: "sent you a follow request",
-          user: data.fromUser,
-        })
-      );
-    });
-  }
+          user: n.from,
+        }));
 
-  return () => {
-    socket.off("newFollowRequest");
-  };
-}, [user]);
+        dispatch(setNotifications(formatted));
+      };
 
+      fetchNotifications();
 
+      socket.on("newFollowRequest", (data) => {
+        dispatch(
+          addNotification({
+            _id: data._id,
+            type: "followRequest",
+            message: "sent you a follow request",
+            user: data.fromUser,
+          }),
+        );
+      });
+    }
+
+    return () => {
+      socket.off("newFollowRequest");
+    };
+  }, [user]);
 
   return (
-    <QueryClientProvider client={queryClient}>
+   
+
+
+     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          {/* Redirect root */}
           <Route path="/" element={<Navigate to="/login" replace />} />
 
-          <Route element={<AuthLayout />}>
+          {/* Public pages with AuthLayout + Protected */}
+          <Route
+            element={
+              <Protected authentication={false}>
+                <AuthLayout />
+              </Protected>
+            }
+          >
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
           </Route>
 
+          {/* Protected pages */}
           <Route
             path="/home"
             element={
-              <MainLayout>
-                <Index />
-              </MainLayout>
+              <Protected authentication={true}>
+                <MainLayout>
+                  <Index />
+                </MainLayout>
+              </Protected>
             }
           />
           <Route
             path="/search"
             element={
-              <MainLayout>
-                <Search />
-              </MainLayout>
+              <Protected authentication={true}>
+                <MainLayout>
+                  <Search />
+                </MainLayout>
+              </Protected>
             }
           />
           <Route
             path="/explore"
             element={
-              <MainLayout>
-                <Explore />
-              </MainLayout>
+              <Protected authentication={true}>
+                <MainLayout>
+                  <Explore />
+                </MainLayout>
+              </Protected>
             }
           />
           <Route
             path="/reels"
             element={
-              <MainLayout>
-                <Reels />
-              </MainLayout>
+              <Protected authentication={true}>
+                <MainLayout>
+                  <Reels />
+                </MainLayout>
+              </Protected>
             }
           />
           <Route
             path="/messages"
             element={
-              <MainLayout>
-                <Messages />
-              </MainLayout>
+              <Protected authentication={true}>
+                <MainLayout>
+                  <Messages />
+                </MainLayout>
+              </Protected>
             }
           />
           <Route
             path="/notifications"
             element={
-              <MainLayout>
-                <Notifications />
-              </MainLayout>
+              <Protected authentication={true}>
+                <MainLayout>
+                  <Notifications />
+                </MainLayout>
+              </Protected>
             }
           />
-          {/* <Route
+          <Route
             path="/profile"
             element={
-              <MainLayout>
-                <Profile />
-              </MainLayout>
+              <Protected authentication={true}>
+                <MainLayout>
+                  <Profile />
+                </MainLayout>
+              </Protected>
             }
           />
           <Route
-            path="/profile/:id"
+            path="/otherprofile/:id"
             element={
-              <MainLayout>
-                <Profile />
-              </MainLayout>
+              <Protected authentication={true}>
+                <MainLayout>
+                  <UserProfile />
+                </MainLayout>
+              </Protected>
             }
-          /> */}
-          <Route
-  path="/profile"
-  element={
-    <MainLayout>
-      <Profile  />
-    </MainLayout>
-  }
-/>
-<Route
-  path="/otherprofile/:id"
-  element={
-    <MainLayout>
-      <UserProfile /> 
-    </MainLayout>
-  }
-/>
-
+          />
           <Route
             path="/settings"
             element={
-              <MainLayout>
-                <Settings darkMode={darkMode} setDarkMode={setDarkMode} />
-              </MainLayout>
+              <Protected authentication={true}>
+                <MainLayout>
+                  <Settings darkMode={darkMode} setDarkMode={setDarkMode} />
+                </MainLayout>
+              </Protected>
             }
           />
 
+          {/* Fallback */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

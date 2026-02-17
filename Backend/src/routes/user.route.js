@@ -8,33 +8,6 @@ const router = express.Router();
 const Notification = require("../module/notification.model");
 
 // follow the user
-// router.put("/follow", requireLogin, async (req, res) => {
-//   try {
-//     const followId = req.body.followId;
-//     const result = await User.findByIdAndUpdate(
-//       followId,
-//       {
-//         $push: { followers: req.user._id },
-//       },
-//       {
-//         new: true,
-//       }
-//     );
-//     const result2 = await User.findByIdAndUpdate(
-//       req.user._id,
-//       {
-//         $push: { following: followId },
-//       },
-//       {
-//         new: true,
-//       }
-//     );
-//     return res.status(200).json({ msg: "Followers Updated", user: result2 });
-//   } catch (error) {
-//     console.log("Error", error);
-//   }
-// });
-
 router.put("/follow", requireLogin, async (req, res) => {
   try {
     const { followId } = req.body;
@@ -335,5 +308,24 @@ router.get("/notifications", requireLogin, async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+router.get("/suggestions", requireLogin, async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.user._id);
+
+    // Find users who are NOT current user AND not already followed
+    let users = await User.find({
+      _id: { $ne: req.user._id, $nin: currentUser.following },
+    })
+      .limit(6) // max 6 suggestions
+      .select("username name avatarUrl accountType"); // ONLY EXISTING FIELDS
+
+    res.json({ users });
+  } catch (err) {
+    console.error("Suggestions error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 
 module.exports = router;

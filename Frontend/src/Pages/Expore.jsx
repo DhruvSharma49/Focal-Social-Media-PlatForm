@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Play } from "lucide-react";
 import { useSelector } from "react-redux";
 import api from "../utils/api";
-import ProfilePostModal from "../components/ProfilePostModal";
-import { exploreImages } from "../data/mockData"; // Default mock data
+import ProfilePostModal from "../components/PostFullScreenModal";
+import { exploreImages } from "../data/mockData"; 
 
 const Explore = () => {
   const [posts, setPosts] = useState([]);

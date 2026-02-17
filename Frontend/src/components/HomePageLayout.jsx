@@ -1,5 +1,5 @@
 import Feed from "../Pages/Feed";
-import RightSidebar from "../components/RightSidebar";
+import RightSidebar from "./RightSidebar";
 
 const Index = () => {
   return (

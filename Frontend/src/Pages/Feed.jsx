@@ -1,11 +1,12 @@
-import Stories from "../components/Stories";
-import Post from "../components/Post";
-import { useEffect, useState } from "react";
-import api from "../utils/api";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import api from "../utils/api";
+import Stories from "../components/Stories";
+import FeedPost from "../components/FeedPost";
 
 const Feed = () => {
   const token = useSelector((state) => state.auth.token);
+  const currentUser = useSelector((state) => state.auth.user);
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
@@ -16,7 +17,7 @@ const Feed = () => {
         });
         setPosts(res.data.posts);
       } catch (err) {
-        console.error(err);
+        console.error("Feed fetch error:", err);
       }
     };
     fetchPosts();
@@ -32,14 +33,11 @@ const Feed = () => {
         </div>
       ) : (
         posts.map((post) => (
-          <Post
+          <FeedPost
             key={post._id}
-            username={post.postedBy.username}
-            userAvatar={post.postedBy.avatarUrl}
-            postImage={post.image}
-            likes={post.likes.length}
-            caption={post.caption}
-            timeAgo={"2h"}
+            post={post}
+            currentUser={currentUser}
+            setPosts={setPosts}
           />
         ))
       )}

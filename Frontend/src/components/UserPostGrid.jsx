@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Heart, MessageCircle } from "lucide-react";
-import ProfilePostModal from "./ProfilePostModal";
+import ProfilePostModal from "./PostFullScreenModal";
 
 const ProfilePostGrid = ({ posts, currentUser, setUserPosts }) => {
   const [selectedPost, setSelectedPost] = useState(null);
