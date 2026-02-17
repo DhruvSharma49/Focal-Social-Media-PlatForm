@@ -19,6 +19,8 @@ import AuthLayout from "./components/AuthLayout";
 import { socket } from "./utils/socket";
 import UserProfile from "./Pages/Userprofile";
 import Protected from "./components/RequireAuth";
+import About from "./Pages/About";
+import Help from "./Pages/Help";
 import {
   addNotification,
   setNotifications,
@@ -39,7 +41,7 @@ const MainLayout = ({ children, showSidebar = true }) => (
 const App = () => {
   const [darkMode, setDarkMode] = useState(false);
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
 
   // First load: apply saved theme instantly
   useEffect(() => {
@@ -69,10 +71,10 @@ const App = () => {
       socket.connect();
       socket.emit("registerUser", user._id);
 
-      // ✅ Fetch DB notifications on login
+      //  Fetch DB notifications on login
       const fetchNotifications = async () => {
         const res = await api.get("/interact/notifications", {
-          headers: { Authorization: `Bearer ${user.token}` },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         const formatted = res.data.notifications.map((n) => ({
@@ -105,10 +107,7 @@ const App = () => {
   }, [user]);
 
   return (
-   
-
-
-     <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
           {/* Redirect root */}
@@ -214,6 +213,22 @@ const App = () => {
                 <MainLayout>
                   <Settings darkMode={darkMode} setDarkMode={setDarkMode} />
                 </MainLayout>
+              </Protected>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <Protected authentication={true}>
+                <About />
+              </Protected>
+            }
+          />
+          <Route
+            path="/help"
+            element={
+              <Protected authentication={true}>
+                <Help />
               </Protected>
             }
           />

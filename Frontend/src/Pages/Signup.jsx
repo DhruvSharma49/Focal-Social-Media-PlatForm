@@ -19,7 +19,7 @@ export default function Signup() {
   return (
     <div className="w-[350px] text-white">
       <div className=" px-10 py-8">
-        <h1 className="text-4xl text-center font-serif mb-4">Instagram</h1>
+        <h1 className="text-4xl text-center font-serif mb-4">Focal</h1>
 
         <p className="text-center text-gray-500 text-sm font-semibold mb-4 " >
           Sign up to see photos and videos from your friends.

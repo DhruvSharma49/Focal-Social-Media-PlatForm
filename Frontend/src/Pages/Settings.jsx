@@ -36,7 +36,7 @@ const Settings = ({ darkMode, setDarkMode }) => {
     {
       title: "How you use Instagram",
       items: [
-        { icon: User, label: "Edit profile" },
+        { icon: User, label: "Edit profile", },
         { icon: Bell, label: "Notifications" },
       ],
     },
@@ -69,15 +69,15 @@ const Settings = ({ darkMode, setDarkMode }) => {
     {
       title: "Your app and media",
       items: [
-        { icon: Globe, label: "Language" },
+        { icon: Globe, label: "Language" ,},
         { icon: Moon, label: "Dark mode", toggle: true },
       ],
     },
     {
       title: "More info and support",
       items: [
-        { icon: HelpCircle, label: "Help" },
-        { icon: Info, label: "About" },
+        { icon: HelpCircle, label: "Help",   action: () => navigate("/help"), },
+        { icon: Info, label: "About",   action: () => navigate("/about"), },
       ],
     },
   ];

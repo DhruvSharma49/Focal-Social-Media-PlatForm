@@ -1,11 +1,3 @@
-// import { useSelector } from "react-redux";
-// import { Navigate } from "react-router-dom";
-
-// export default function RequireAuth({ children }) {
-//   const isAuth = useSelector((state) => state.auth.isAuth);
-//   return isAuth ? children : <Navigate to="/login" replace />;
-// }
-
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";

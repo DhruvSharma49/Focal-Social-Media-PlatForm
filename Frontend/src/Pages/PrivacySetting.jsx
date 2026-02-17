@@ -19,7 +19,7 @@ const PrivacySettings = ({ onBack }) => {
       setAccountType(res.data.user.accountType);
       setShowFollowers(res.data.user.showFollowers);
     };
-    if (user?._id) fetchPrivacy();
+    if (user?._id && token) fetchPrivacy();
   }, [user, token]);
 
   const updateSetting = async (data) => {

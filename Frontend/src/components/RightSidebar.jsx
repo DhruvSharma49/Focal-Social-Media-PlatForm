@@ -163,7 +163,7 @@ const RightSidebar = () => {
             </span>
           ))}
         </div>
-        <p className="text-xs text-text-tertiary">© 2026 INSTAGRAM FROM META</p>
+        <p className="text-xs text-text-tertiary">© 2026 FOCAL FROM META</p>
       </div>
 
       {/* Messages shortcut */}

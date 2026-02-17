@@ -17,14 +17,14 @@ export default function Login() {
 
   const submit = async (data) => {
     try {
-      //LOGIN
+      //1. LOGIN
       const res = await api.post("/user/login", data);
 
       const { token, user } = res.data;
 
       dispatch(loginSuccess({ token, user }));
 
-      // ✅ 2. FETCH NOTIFICATIONS AFTER LOGIN
+      //  2. FETCH NOTIFICATIONS AFTER LOGIN
       const notifRes = await api.get("/interact/notifications", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ export default function Login() {
         );
       });
 
-      // ✅ 3. THEN NAVIGATE
+      //  3. THEN NAVIGATE
       navigate("/profile");
     } catch (err) {
       console.error("Login failed", err.response?.data || err);
@@ -55,7 +55,7 @@ export default function Login() {
         onSubmit={handleSubmit(submit)}
         className="px-12 py-8 bg-gray-900 rounded-lg"
       >
-        <h1 className="text-4xl text-center font-serif mb-8">Instagram</h1>
+        <h1 className="text-4xl text-center font-serif mb-8">Focal</h1>
 
         <input
           {...register("email", { required: "Email is required" })}

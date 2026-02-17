@@ -20,11 +20,14 @@ const authRoutes = require("./src/routes/auth.route");
 const postRoutes=require("./src/routes/post.route");
 const interactRoutes=require("./src/routes/user.route");
 const storyRoute=require("./src/routes/story.route");
+const privacyRoute=require("./src/routes/privacy.route")
 
 app.use("/user", authRoutes);
 app.use("/post",postRoutes);
 app.use("/interact",interactRoutes);
 app.use("/createstory",storyRoute);
+app.use("/privacy",privacyRoute);
+
 
 module.exports=app;
 

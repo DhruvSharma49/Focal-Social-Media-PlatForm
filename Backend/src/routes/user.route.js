@@ -3,9 +3,8 @@ const requireLogin = require("../middleware/requirelogin");
 const { getIO, getOnlineUsers } = require("../../socket");
 const User = require("../module/user.model");
 const Post = require("../module/post.model");
-const router = express.Router();
-
 const Notification = require("../module/notification.model");
+const router = express.Router();
 
 // follow the user
 router.put("/follow", requireLogin, async (req, res) => {
@@ -33,14 +32,14 @@ router.put("/follow", requireLogin, async (req, res) => {
         userToFollow.followRequests.push(currentUser._id);
         await userToFollow.save();
 
-        // ✅ 1. SAVE IN DB
+        //  1. SAVE IN DB
         const newNotification = await Notification.create({
           to: userToFollow._id,
           from: currentUser._id,
           type: "followRequest",
         });
 
-        // ✅ 2. SEND REALTIME IF ONLINE
+        //  2. SEND REALTIME IF ONLINE
         const io = getIO();
         const onlineUsers = getOnlineUsers();
         const socketId = onlineUsers.get(followId);
@@ -120,7 +119,7 @@ router.get("/searchusers", requireLogin, async (req, res) => {
   }
 });
 
-// Change privacy (including public/private toggle)
+// Change privacy (public account to private account)
 router.put("/user/privacy/:id", requireLogin, async (req, res) => {
   try {
     if (req.user._id.toString() !== req.params.id)
@@ -169,64 +168,6 @@ router.put("/user/update-username", requireLogin, async (req, res) => {
   }
 });
 
-router.put("/approve/:userId", requireLogin, async (req, res) => {
-  try {
-    const requesterId = req.params.userId;
-
-    const currentUser = await User.findById(req.user._id);
-    const requester = await User.findById(requesterId);
-
-    currentUser.followRequests.pull(requesterId);
-
-    if (!currentUser.followers.includes(requesterId)) {
-      currentUser.followers.push(requesterId);
-    }
-
-    if (!requester.following.includes(currentUser._id)) {
-      requester.following.push(currentUser._id);
-    }
-
-    await currentUser.save();
-    await requester.save();
-
-    // 🔥 IMPORTANT CHANGE
-    const deletedNotification = await Notification.findOneAndDelete({
-      to: currentUser._id,
-      from: requesterId,
-      type: "followRequest",
-    });
-
-    res.json({
-      msg: "Request approved",
-      deletedNotificationId: deletedNotification?._id,
-    });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-router.put("/reject/:userId", requireLogin, async (req, res) => {
-  try {
-    const requesterId = req.params.userId;
-
-    const currentUser = await User.findById(req.user._id);
-
-    currentUser.followRequests.pull(requesterId);
-    await currentUser.save();
-
-    // DELETE notification from DB
-    await Notification.deleteOne({
-      to: currentUser._id,
-      from: requesterId,
-      type: "followRequest",
-    });
-
-    res.json({ msg: "Request rejected", requesterId });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
 // Get Other User Profile
 router.get("/otherprofile/:id", requireLogin, async (req, res) => {
   try {
@@ -235,9 +176,7 @@ router.get("/otherprofile/:id", requireLogin, async (req, res) => {
       .populate("followers", "_id name username")
       .populate("following", "_id name username");
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+    if (!user) return res.status(404).json({ error: "User not found" });
 
     const posts = await Post.find({ postedBy: req.params.id })
       .populate("postedBy", "username avatarUrl")
@@ -252,10 +191,43 @@ router.get("/otherprofile/:id", requireLogin, async (req, res) => {
 
     let followersCount = user.followers.length;
     let followingCount = user.following.length;
+    let visibleFollowers = [];
+    let visibleFollowing = [];
+    let visiblePosts = posts;
 
-    if (user.accountType === "private" && !isOwner && !isFollower) {
-      followersCount = user.showFollowers ? user.followers.length : 0;
-      followingCount = 0;
+    // PRIVATE ACCOUNT LOGIC
+    if (user.accountType === "private") {
+      if (!isOwner && !isFollower) {
+        // Not follower
+        visiblePosts = [];
+        visibleFollowers = [];
+        visibleFollowing = [];
+      } else {
+        // Owner or Follower
+        visiblePosts = posts;
+        visibleFollowers = user.followers;
+        visibleFollowing = user.following;
+      }
+    }
+
+    // PUBLIC ACCOUNT LOGIC
+    if (user.accountType === "public") {
+      visiblePosts = posts;
+
+      if (user.showFollowers) {
+        visibleFollowers = user.followers;
+        visibleFollowing = user.following;
+      } else {
+        visibleFollowers = [];
+        visibleFollowing = [];
+      }
+    }
+
+    // OWNER → always full access
+    if (isOwner) {
+      visibleFollowers = user.followers;
+      visibleFollowing = user.following;
+      visiblePosts = posts;
     }
 
     res.json({
@@ -263,11 +235,13 @@ router.get("/otherprofile/:id", requireLogin, async (req, res) => {
         ...user.toObject(),
         followersCount,
         followingCount,
+        followers: visibleFollowers,
+        following: visibleFollowing,
       },
-      posts:
-        user.accountType === "private" && !isOwner && !isFollower ? [] : posts,
+      posts: visiblePosts,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -326,6 +300,5 @@ router.get("/suggestions", requireLogin, async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 module.exports = router;
