@@ -17,7 +17,7 @@
 
 **Focal** is a full-stack Instagram-inspired social media platform built with the MERN stack. Share photos, connect with friends, explore stories, send real-time messages, and engage with a vibrant community — all in one beautifully crafted app.
 
-[🌐 Live Demo](#) · [📖 API Docs](#api-documentation) · [🐛 Report Bug](issues/) · [✨ Request Feature](issues/)
+[🌐 Live Demo](#) 
 
 </div>
 
