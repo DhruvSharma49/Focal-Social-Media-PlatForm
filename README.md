@@ -256,57 +256,13 @@ Before you begin, ensure you have the following installed:
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/YOUR_USERNAME/focal.git
-cd focal
-```
-
-### 2. Backend Setup
-
-```bash
-# Navigate to the Backend directory
-cd Backend
-
-# Install dependencies
-npm install
-
-# Create your environment file
-cp .env.example .env
-# → Fill in your values (see Environment Variables section below)
-
-# Start the development server with nodemon
-npm run dev
-```
-
-The backend server will start on **http://localhost:5000**
-
-### 3. Frontend Setup
-
-```bash
-# Open a new terminal and navigate to Frontend
-cd Frontend
-
-# Install dependencies
-npm install
-
-# Start the React + Vite development server
-npm run dev
-```
-
-The frontend will be available at **http://localhost:5173**
-
-### 4. Environment Variables
+### 3. Environment Variables
 
 #### Server (`Backend/.env`)
 
 ```env
 # ─── Server ───────────────────────────────────────────────
-PORT=5000
-NODE_ENV=development
+PORT=
 
 # ─── MongoDB Atlas ────────────────────────────────────────
 MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/focal?retryWrites=true&w=majority
@@ -321,14 +277,14 @@ CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 
 # ─── Client ───────────────────────────────────────────────
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=""
 ```
 
 #### Client (`Frontend/.env`)
 
 ```env
-VITE_API_BASE_URL=http://localhost:5000/api
-VITE_SOCKET_URL=http://localhost:5000
+VITE_API_BASE_URL=""
+VITE_SOCKET_URL=""
 ```
 
 > ⚠️ **Never commit `.env` files to version control.** They are included in `.gitignore` by default.
@@ -672,6 +628,7 @@ The client uses **Redux Toolkit** for global state management. The store is conf
 - `Frontend/src/utils/Authheader.jsx` — Returns `{ Authorization: Bearer <token> }` header for API calls
 - `Frontend/src/utils/socket.js` — Initializes and exports the Socket.IO client singleton
 
+<<<<<<< HEAD
 ---
 
 ## 🎨 UI & Theming
@@ -687,6 +644,8 @@ The client uses **Redux Toolkit** for global state management. The store is conf
 
 ---
 
+=======
+>>>>>>> 08efbff (Update some logic and readme.md file)
 ## 📦 Dependencies
 
 ### Backend (`/server`)
@@ -745,6 +704,28 @@ Contributions are welcome and greatly appreciated! Here's how to get involved:
    ```
 5. **Open** a Pull Request against `main`
 
+<<<<<<< HEAD
+=======
+### Commit Convention
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/):
+
+| Prefix | Use for |
+|--------|---------|
+| `feat:` | New feature |
+| `fix:` | Bug fix |
+| `docs:` | Documentation changes |
+| `style:` | Formatting, no logic changes |
+| `refactor:` | Code restructuring |
+| `test:` | Adding or fixing tests |
+| `chore:` | Build process or auxiliary tool changes |
+
+### Code Style
+
+- **ESLint** + **Prettier** are configured for both client and server
+- Run `npm run lint` before opening a PR
+- Aim for self-documenting code with JSDoc comments on complex functions
+>>>>>>> 08efbff (Update some logic and readme.md file)
 
 ## 👤 Author
 
