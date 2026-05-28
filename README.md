@@ -766,53 +766,16 @@ Contributions are welcome and greatly appreciated! Here's how to get involved:
    ```
 5. **Open** a Pull Request against `main`
 
-### Commit Convention
-
-This project follows [Conventional Commits](https://www.conventionalcommits.org/):
-
-| Prefix | Use for |
-|--------|---------|
-| `feat:` | New feature |
-| `fix:` | Bug fix |
-| `docs:` | Documentation changes |
-| `style:` | Formatting, no logic changes |
-| `refactor:` | Code restructuring |
-| `test:` | Adding or fixing tests |
-| `chore:` | Build process or auxiliary tool changes |
-
-### Code Style
-
-- **ESLint** + **Prettier** are configured for both client and server
-- Run `npm run lint` before opening a PR
-- Aim for self-documenting code with JSDoc comments on complex functions
-
----
-
-## 🛡️ License
-
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2024 YOUR_NAME
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction...
-```
-
----
 
 ## 👤 Author
 
 <div align="center">
 
-**Your Name**
+**Dhruv Sharma*
 
 [![GitHub](https://img.shields.io/badge/GitHub-@YOUR__USERNAME-181717?style=flat-square&logo=github)](https://github.com/YOUR_USERNAME)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-yourprofile-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/YOUR_PROFILE)
-[![Portfolio](https://img.shields.io/badge/Portfolio-yoursite.com-E1306C?style=flat-square&logo=google-chrome)](https://yoursite.com)
+[![LinkedIn](https://www.linkedin.com/in/dhruv-sharma-25822228a/)
+[![Portfolio](https://dhruv-sharma-portfolio-neon.vercel.app/)
 
 </div>
 
@@ -822,6 +785,6 @@ in the Software without restriction...
 
 ⭐ **If you found this project useful, please give it a star!** ⭐
 
-Made with ❤️ and ☕ by [Your Name](https://github.com/YOUR_USERNAME)
+Made with ❤️ and ☕ by [Dhruv Sharma](https://github.com/DhruvSharma49)
 
 </div>
