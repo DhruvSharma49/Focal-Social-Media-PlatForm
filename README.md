@@ -17,7 +17,7 @@
 
 **Focal** is a full-stack Instagram-inspired social media platform built with the MERN stack. Share photos, connect with friends, explore stories, send real-time messages, and engage with a vibrant community — all in one beautifully crafted app.
 
-[🌐 Live Demo](#) 
+
 
 </div>
 
@@ -628,24 +628,6 @@ The client uses **Redux Toolkit** for global state management. The store is conf
 - `Frontend/src/utils/Authheader.jsx` — Returns `{ Authorization: Bearer <token> }` header for API calls
 - `Frontend/src/utils/socket.js` — Initializes and exports the Socket.IO client singleton
 
-<<<<<<< HEAD
----
-
-## 🎨 UI & Theming
-
-- Built entirely with **Tailwind CSS 3** utility classes
-- Custom theme colors extending Tailwind's default palette:
-
-```
-
-- Dark mode supported via `.dark` class on `<html>` element
-- Smooth page transitions with CSS animations
-- Responsive breakpoints: `sm (640px)`, `md (768px)`, `lg (1024px)`, `xl (1280px)`
-
----
-
-=======
->>>>>>> 08efbff (Update some logic and readme.md file)
 ## 📦 Dependencies
 
 ### Backend (`/server`)
@@ -704,8 +686,6 @@ Contributions are welcome and greatly appreciated! Here's how to get involved:
    ```
 5. **Open** a Pull Request against `main`
 
-<<<<<<< HEAD
-=======
 ### Commit Convention
 
 This project follows [Conventional Commits](https://www.conventionalcommits.org/):
@@ -725,7 +705,6 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 - **ESLint** + **Prettier** are configured for both client and server
 - Run `npm run lint` before opening a PR
 - Aim for self-documenting code with JSDoc comments on complex functions
->>>>>>> 08efbff (Update some logic and readme.md file)
 
 ## 👤 Author
 
