@@ -679,27 +679,6 @@ The client uses **Redux Toolkit** for global state management. The store is conf
 - Built entirely with **Tailwind CSS 3** utility classes
 - Custom theme colors extending Tailwind's default palette:
 
-```javascript
-// tailwind.config.js
-module.exports = {
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        focal: {
-          pink:    '#E1306C',
-          purple:  '#833AB4',
-          orange:  '#F77737',
-          yellow:  '#FCAF45',
-          blue:    '#405DE6',
-        }
-      },
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-      }
-    }
-  }
-}
 ```
 
 - Dark mode supported via `.dark` class on `<html>` element
