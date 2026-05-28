@@ -773,8 +773,8 @@ Contributions are welcome and greatly appreciated! Here's how to get involved:
 
 *Dhruv Sharma*
 
-[![GitHub](https://img.shields.io/badge/GitHub-@YOUR__USERNAME-181717?style=flat-square&logo=github)](https://github.com/YOUR_USERNAME)
-[![LinkedIn](https://www.linkedin.com/in/dhruv-sharma-25822228a/)
+[![GitHub](https://img.shields.io/badge/GitHub-@YOUR__USERNAME-181717?style=flat-square&logo=github)](https://github.com/DhruvSharma49)
+[![LinkedIn(https://www.linkedin.com/in/dhruv-sharma-25822228a/
 [![Portfolio]https://dhruv-sharma-portfolio-neon.vercel.app/
 
 </div>
